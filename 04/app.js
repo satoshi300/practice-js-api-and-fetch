@@ -18,21 +18,51 @@
 
 // Uwaga! Podczas tworzenia rozwiązań wykorzystujących API, możesz się spotkać z problemem dotyczącym CORS. Jeśli on wystąpi, to nie będziesz mógł pobrać danych z API. Wszystko zależy od konfiguracji przeglądarki i serwera. Problem zidentyfikujesz przez odpowiedni komunikat w konsoli. Możesz próbować wyłączyć to zabezpieczenie w przeglądarce przez odpowiedni plugin lub wykorzystać pośrednika. Problem z CORS może być spowodowany również tym, że uruchamiasz plik przez protokół file://. Wówczas wystarczy, że uruchomisz plik .html przy pomocy rozszerzenia Live Server do VSC.
 
-document.addEventListener('DOMContentLoaded', init);
+// document.addEventListener('DOMContentLoaded', init);
 
-function init() {
-    console.log('DOM');
-    handleSubmit();
-}
+// function init() {
+//     console.log('DOM');
+//     // handleSubmit();
+//     // getWeather();
+//     // getInfo();
+// }
 
-const submitInput = document.querySelector('.form__submit')
-submitInput.addEventListener('click', handleSubmit)
 
-console.log(submitInput)
+const submitEl = document.querySelector('.form__submit');
+submitEl.addEventListener('click', getWeather);
+console.log(submitEl)
 
-function handleSubmit() {
-    // console.log('test przycisku')
-    const promise = fetch('https://api.weatherbit.io/v2.0/current?key=deeaed3434f040bab058e759479f90f5&lang=pl&lat=52.232222&lon=21.008333&units=I&description');
+function getWeather(e) {
+    e.preventDefault();
+    const latEl = document.querySelector('.form__field--lat');
+    const lngEl = document.querySelector('.form__field--lng');
+
+    keyEl = 'deeaed3434f040bab058e759479f90f5';
+    // langEl = 'pl'
+    latVal = latEl.value.trim();
+    lngVal = lngEl.value.trim();
+
+    if (latVal === '' || lngVal === '') {
+        alert('Podaj współrzędne – pola nie mogą być puste!');
+        return;
+    }
+
+    latVal = Number(latVal);
+    lngVal = Number(lngVal);
+
+    if (isNaN(latVal) && isNaN(lngVal)) {
+        alert('Podaj prawidłowe liczby dla współrzędnych!');
+        return;
+
+    }
+    if (latVal < -90 || latVal > 90 || lngVal < -180 || lngVal > 180) {
+        alert("Wprowadź poprawny zakres: szerokość -90 do 90, długość -180 do 180.");
+        return;
+    }
+
+    console.log(latVal)
+    console.log(lngVal)
+    const promise = fetch(`https://api.weatherbit.io/v2.0/current?key=${keyEl}&lang=pl&lat=${latVal}&lon=${lngVal}&units=I&description`);
 
     promise
         .then(resp => {
@@ -40,6 +70,15 @@ function handleSubmit() {
             return Promise.reject(resp);
         })
         .then(resp => {
+            const weatherLat = document.querySelector('.weather__lat')
+            const weatherLng = document.querySelector('.weather__lng')
+            const weatherSummary = document.querySelector('.weather__summary')
+            const weatherTemp = document.querySelector('.weather__temperature')
+            weatherLat.innerText = latVal;
+            weatherLng.innerText = lngVal;
+            weatherSummary.innerText = resp.data[0].weather.description;
+            weatherTemp.innerText = resp.data[0].temp;
+            console.log(weatherLat)
             console.log(resp.data[0].lat, resp.data[0].lon, resp.data[0].temp, resp.data[0].weather.description)
         })
         .catch(err => console.error(err))
@@ -47,3 +86,5 @@ function handleSubmit() {
             console.log('Odpytywanie API zakończone!')
         });
 }
+
+
