@@ -27,7 +27,6 @@
 //     // getInfo();
 // }
 
-
 const submitEl = document.querySelector('.form__submit');
 submitEl.addEventListener('click', getWeather);
 console.log(submitEl)
@@ -38,7 +37,7 @@ function getWeather(e) {
     const lngEl = document.querySelector('.form__field--lng');
 
     keyEl = 'deeaed3434f040bab058e759479f90f5';
-    // langEl = 'pl'
+    langEl = 'pl'
     latVal = latEl.value.trim();
     lngVal = lngEl.value.trim();
 
@@ -53,15 +52,13 @@ function getWeather(e) {
     if (isNaN(latVal) && isNaN(lngVal)) {
         alert('Podaj prawidłowe liczby dla współrzędnych!');
         return;
-
     }
+    
     if (latVal < -90 || latVal > 90 || lngVal < -180 || lngVal > 180) {
         alert("Wprowadź poprawny zakres: szerokość -90 do 90, długość -180 do 180.");
         return;
     }
 
-    console.log(latVal)
-    console.log(lngVal)
     const promise = fetch(`https://api.weatherbit.io/v2.0/current?key=${keyEl}&lang=pl&lat=${latVal}&lon=${lngVal}&units=I&description`);
 
     promise
